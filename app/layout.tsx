@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {Poppins} from 'next/font/google'
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['100', '200','300','400','500','600','700','800', '900'],
+  variable: '--font-poppins',
+
+})
 
 //import { Geist, Geist_Mono } from "next/font/google";
 /*
@@ -25,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${poppins.variable} font-poppins antialiased`}>
         {children}
       </body>
     </html>
