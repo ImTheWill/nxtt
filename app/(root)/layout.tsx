@@ -3,6 +3,8 @@ import MobileNavigation from "@/components/MobileNavigation";
 import Header from "@/components/Header";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
+import { Toaster } from "sonner";
+
 //we fetch here
 
 const Layout = async ({children}:{children:React.ReactNode}) => {
@@ -18,6 +20,7 @@ const Layout = async ({children}:{children:React.ReactNode}) => {
                 <div className="main-content">
                     {children}
                 </div>
+                <Toaster/>
             </section>
         </main>
      );
