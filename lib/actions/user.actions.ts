@@ -4,15 +4,15 @@ import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { Query, ID } from "node-appwrite";
 import { parseStringify } from "@/lib/utils";
+import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
 
   const result = await databases.listDocuments(
-    appwriteConfig.databaseID,
-    appwriteConfig.usersCollectionID,
+    appwriteConfig.databaseId,
+    appwriteConfig.usersCollectionId,
     [Query.equal("email", [email])],
   );
 
@@ -47,19 +47,20 @@ export const createAccount = async ({
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId) throw new Error("Failed to send an OTP");
+  console.log("ACCOUNT_ID",accountId)
 
   if (!existingUser) {
     const { databases } = await createAdminClient();
-
+    console.log("ACCOUNT_ID",accountId)
     await databases.createDocument(
-      appwriteConfig.databaseID,
-      appwriteConfig.usersCollectionID,
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
       ID.unique(),
       {
         fullName,
         email,
-        avatar:"https://img.freepik.com/premium-vector/profile-picture-placeholder-avatar-silhouette-gray-tones-icon-colored-shapes-gradient_1076610-40164.jpg",
-        accountId,
+        avatar: avatarPlaceholderUrl,
+        accountId
       },
     );
   }
@@ -99,8 +100,8 @@ export const getCurrentUser = async () => {
     const result = await account.get();
 
     const user = await databases.listDocuments(
-      appwriteConfig.databaseID,
-      appwriteConfig.usersCollectionID
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
       [Query.equal("accountId", result.$id)],
     );
 

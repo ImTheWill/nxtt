@@ -1,49 +1,48 @@
 "use server";
 
+import { Account, Avatars, Client, Databases, Storage } from "node-appwrite";
+import { appwriteConfig } from "@/lib/appwrite/config";
 import { cookies } from "next/headers";
-import { appwriteConfig } from "./config"
-import {Account, Avatars, Client, Databases, Storage} from "node-appwrite";
-//node appwrite
 
-//can create admin client or session client,
-//session client is linked specifically to a user session letting users access their data or perform actions they are allowed to
-export const createSessionClient = async () =>{
-    const client = new Client().setEndpoint(appwriteConfig.endpointUrl).setProject(appwriteConfig.projectID);
+export const createSessionClient = async () => {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointUrl)
+    .setProject(appwriteConfig.projectId);
 
-    const session =  (await cookies()).get('appwrite-session');
-    if(!session || !session.value){
-        throw new Error('no sesssion')
-    }
-    client.setSession(session.value)
-    return {
-        get account(){
-            return new Account(client);
-        },
-        get databases(){
-            return new Databases(client);
-        }
-    }
-}
+  const session = (await cookies()).get("appwrite-session");
 
+  if (!session || !session.value) throw new Error("No session");
 
-//admin client used to create new users, manage databases or handle high level access never exposed to use directly
-export const createAdminClient = async ()=>{
-    const client = new Client().setEndpoint(appwriteConfig.endpointUrl).setProject(appwriteConfig.projectID).setKey(appwriteConfig.secretKey);
+  client.setSession(session.value);
 
+  return {
+    get account() {
+      return new Account(client);
+    },
+    get databases() {
+      return new Databases(client);
+    },
+  };
+};
 
-    return {
-        get account(){
-            return new Account(client);
-        },
-        get databases(){
-            return new Databases(client);
-        },
-        get storage(){
-            return new Storage(client);
+export const createAdminClient = async () => {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointUrl)
+    .setProject(appwriteConfig.projectId)
+    .setKey(appwriteConfig.secretKey);
 
-        },
-        get Avatar(){
-            return new Avatars(client)
-        }
-    }
-}
+  return {
+    get account() {
+      return new Account(client);
+    },
+    get databases() {
+      return new Databases(client);
+    },
+    get storage() {
+      return new Storage(client);
+    },
+    get avatars() {
+      return new Avatars(client);
+    },
+  };
+};
