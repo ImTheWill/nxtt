@@ -6,17 +6,16 @@ import { redirect } from "next/navigation";
 import { Toaster } from "sonner";
 
 //we fetch here
-
+//prop drilling is occurring here might be beneficial to use something else
 const Layout = async ({children}:{children:React.ReactNode}) => {
     const currentUser = await getCurrentUser(); //gets user session info
     if(!currentUser) return redirect("/sign-in");//if user doesnt exist
-
     return ( 
         <main className="flex h-screen">
               <Sidebar {...currentUser}/>
             <section className="flex h-full flex-1 flex-col">
                     <MobileNavigation {...currentUser}/>
-                    <Header/>
+                    <Header {...currentUser} ownerId={currentUser.$id}/>
                 <div className="main-content">
                     {children}
                 </div>

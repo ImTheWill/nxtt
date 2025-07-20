@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
-import React, {useCallback} from 'react'
-import {useDropzone} from 'react-dropzone'
-import { Button } from './ui/button'
-import Image from 'next/image'
-import { useState } from 'react'
-import Thumbnail from './Thumbnail'
-import { cn, convertFileToUrl,getFileType  } from '@/lib/utils'
-import { MAX_FILE_SIZE } from '@/constants'
-import { toast } from 'sonner'
-import { uploadFile } from '@/lib/actions/file.actions'
+import React, { useCallback, useState } from "react";
+
+import { useDropzone } from "react-dropzone";
+import { Button } from "@/components/ui/button";
+import { cn, convertFileToUrl, getFileType } from "@/lib/utils";
+import Image from "next/image";
+import Thumbnail from "@/components/Thumbnail";
+import { MAX_FILE_SIZE } from "@/constants";
+import { uploadFile } from "@/lib/actions/file.actions";
+import { usePathname } from "next/navigation";
+import { toast } from "sonner"
 
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 //using react-dropzone which is a hook for simple drag n drop zone for files
+//use call back to handle file upload so that the function is not recreated on every render only when thee dependencies change[ownerId, accountId, path]
 const FileUploader = ({ ownerId, accountId, className }: Props) => {
   const path = usePathname();
   const [files, setFiles] = useState<File[]>([]);
@@ -33,7 +35,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
             prevFiles.filter((f) => f.name !== file.name),
           );
 
-          return toast({description: (<p className='body-2 text-whiote'><span className='font-semibold'>{file.name}</span>is too large. Max File size is 50MB.</p>), className: "error-toast"});
+          return toast("",{description: (<p className='body-2 text-whiote'><span className='font-semibold'>{file.name}</span>is too large. Max File size is 50MB.</p>), className: "error-toast"});
         }
 
         return uploadFile({ file, ownerId, accountId, path }).then(
@@ -47,7 +49,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
         );
       });
 
-      await Promise.all(uploadPromises);
+      await Promise.all(uploadPromises);// Wait for all uploads to complete
     },
     [ownerId, accountId, path],
   );
