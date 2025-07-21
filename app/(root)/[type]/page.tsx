@@ -10,7 +10,6 @@ const Page = async ({params}: SearchParamProps) => {
     const type = ((await params)?.type as string) || ""; // Extracting the type from the URL parameters
 
     const files = await getFiles(); // Fetching files based on the type
-    console.log(files);
 
 
     return ( 

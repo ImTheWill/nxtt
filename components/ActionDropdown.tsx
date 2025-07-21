@@ -27,6 +27,8 @@ import { constructDownloadUrl } from '@/lib/utils';
 import { Button } from './ui/button';
 import { renameFile } from '@/lib/actions/file.actions';
 import { usePathname } from 'next/navigation';
+import { FileDetails } from './ActionsModalContent';
+import ShareInput from './ShareInput';
 
 function ActionDropdown({file}:{file: Models.Document}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +36,13 @@ function ActionDropdown({file}:{file: Models.Document}) {
   const [action, setAction] = useState<ActionType | null >(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
+  const [emails, setEmails] = useState([]); //for share action
+
+  const handleRemoveUser = (email: string) => {
+    // Remove user from the emails array
+  }
   const path = usePathname();
+
 
   const closeAllModals = () => {
     setIsModalOpen(false);
@@ -49,7 +57,7 @@ function ActionDropdown({file}:{file: Models.Document}) {
     setIsLoading(true);
     let success = false;
     const actions = {
-      rename: () => renameFile({fileId: file.$id, name, extension:file.extenstion, path}),
+      rename: () => renameFile({fileId: file.$id, name, extension: file.extension, path}),
       share: () => console.log("Share action not implemented yet"),
       delete: () => console.log("Delete action not implemented yet"),
     }
@@ -71,6 +79,11 @@ function ActionDropdown({file}:{file: Models.Document}) {
           {value === 'rename' && (<Input type = "text" value = {name} onChange={(e)=>setName(e.target.value)}/>)
           
           }
+          {value === 'details' && <FileDetails file = {file}/>
+          }
+          {value === 'share' && (
+            <ShareInput file = {file} onInputChange = {setEmails} onRemove = {handleRemoveUser} />
+          )}
         </DialogHeader>
         {['rename', 'share', 'delete'].includes(value) && (
           <DialogFooter className='flex flex-col gap-3 md:flex-row'>

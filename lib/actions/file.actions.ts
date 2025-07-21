@@ -88,13 +88,14 @@ export const renameFile = async ({fileId, name, extension,path}:RenameFileProps)
     const {databases} = await createAdminClient();
 
     try{
-        const newName = `${name}${extension}`;
+        const newName = `${name}.${extension}`;
+        console.log("Renaming file to:", newName);
         const updatedFile = await databases.updateDocument(
             appwriteConfig.databaseId,
             appwriteConfig.filesCollectionId,
             fileId,
             {
-                name: newName,
+                name: newName
             }
         );
         revalidatePath(path);
