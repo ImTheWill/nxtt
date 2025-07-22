@@ -25,10 +25,9 @@ import { Input } from './ui/input';
 import Link from 'next/link';
 import { constructDownloadUrl } from '@/lib/utils';
 import { Button } from './ui/button';
-import { renameFile } from '@/lib/actions/file.actions';
+import { deleteFile, renameFile, updateFileUsers } from '@/lib/actions/file.actions';
 import { usePathname } from 'next/navigation';
-import { FileDetails } from './ActionsModalContent';
-import ShareInput from './ShareInput';
+import { FileDetails, ShareInput } from './ActionsModalContent';
 
 function ActionDropdown({file}:{file: Models.Document}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,10 +35,18 @@ function ActionDropdown({file}:{file: Models.Document}) {
   const [action, setAction] = useState<ActionType | null >(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
-  const [emails, setEmails] = useState([]); //for share action
+  const [emails, setEmails] = useState<string[]>([]); //for share action
 
-  const handleRemoveUser = (email: string) => {
-    // Remove user from the emails array
+  const handleRemoveUser = async (email: string) => {
+    const updatedEmails = emails.filter((e) => e !== email);
+    const success = await updateFileUsers({fileId: file.$id, emails: updatedEmails, path});
+    if (success) {
+      setEmails(updatedEmails);
+      closeAllModals();
+    } else {
+      console.error("Failed to remove user");
+      closeAllModals();
+    }
   }
   const path = usePathname();
 
@@ -58,8 +65,8 @@ function ActionDropdown({file}:{file: Models.Document}) {
     let success = false;
     const actions = {
       rename: () => renameFile({fileId: file.$id, name, extension: file.extension, path}),
-      share: () => console.log("Share action not implemented yet"),
-      delete: () => console.log("Delete action not implemented yet"),
+      share: () => updateFileUsers({fileId: file.$id, emails, path}),
+      delete: () => deleteFile({fileId: file.$id, bucketFileId: file.bucketFileId, path}),
     }
 
     success = await actions[action.value as keyof typeof actions](); //keyof typeof actions denotes that it can only be those keys
@@ -83,6 +90,14 @@ function ActionDropdown({file}:{file: Models.Document}) {
           }
           {value === 'share' && (
             <ShareInput file = {file} onInputChange = {setEmails} onRemove = {handleRemoveUser} />
+          )}
+          {value === 'delete' && (
+            <p className='delete-confirmation'>
+              Are you sure you want to delete this file? This action cannot be undone.
+              <span className='delete-file-name'>
+                {file.name}
+              </span>?
+            </p>
           )}
         </DialogHeader>
         {['rename', 'share', 'delete'].includes(value) && (

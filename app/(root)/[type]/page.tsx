@@ -2,14 +2,20 @@ import Sort from "@/components/Sort";
 import { getFiles } from "@/lib/actions/file.actions";
 import Card from "@/components/Card";
 import { Models } from "node-appwrite";
+import { getFileTypesParams } from "@/lib/utils";
 
 
 
 //dynamic page to handle search parameters in Next.js
-const Page = async ({params}: SearchParamProps) => {
+const Page = async ({searchParams,params}: SearchParamProps) => {
     const type = ((await params)?.type as string) || ""; // Extracting the type from the URL parameters
+    const searchText = ((await searchParams)?.type as string) || ""; // Extracting the search text from the URL parameters
+    const sort = ((await searchParams)?.sort as string) || "";
 
-    const files = await getFiles(); // Fetching files based on the type
+
+    const types = getFileTypesParams(type) as FileType[]
+
+    const files = await getFiles({types, searchText, sort}); // Fetching files based on the type
 
 
     return ( 
